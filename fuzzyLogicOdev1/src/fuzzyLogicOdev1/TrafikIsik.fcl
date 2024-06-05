@@ -1,0 +1,61 @@
+FUNCTION_BLOCK TrafikIsik
+
+VAR_INPUT
+	yesilArac : REAL;
+	kirmiziArac : REAL;
+END_VAR
+
+VAR_OUTPUT
+	yesilSure : REAL;
+END_VAR
+
+FUZZIFY yesilArac
+	TERM sifir := (0,1)(1,0);
+	TERM dusuk := TRAPE 0 2 4 6;
+	TERM orta := (4,0)(6,1)(8,0);
+	TERM yuksek := TRAPE 6 8 24 24;
+END_FUZZIFY
+
+FUZZIFY kirmiziArac
+	TERM sifir := (0,1)(1,0);
+	TERM dusuk := TRAPE 0 2 10 12;
+	TERM orta := (6,0)(12,1)(18,0);
+	TERM yuksek := TRAPE 14 18 24 24;
+END_FUZZIFY
+
+DEFUZZIFY yesilSure
+	TERM sifir := TRAPE 0 0 15 25;
+	TERM kisa := (15,0)(25,1)(35,0);
+	TERM kisaNormal := (25,0)(35,1)(45,0);
+	TERM normal := (35,0)(45,1)(55,0);
+	TERM normalUzun := (45,0)(55,1)(65,0);
+	TERM uzun := (55,0)(65,1)(90,0);
+	TERM cokUzun := TRAPE 75 90 110 110;
+	METHOD : RM;
+	DEFAULT := 30;
+END_DEFUZZIFY
+
+RULEBLOCK kuralBlok1
+	AND : MIN;
+	ACT : MIN;
+	ACCU : MAX;
+	
+	RULE 1 : IF yesilArac IS sifir THEN yesilSure IS sifir;
+	RULE 2 : IF yesilArac IS dusuk AND kirmiziArac IS sifir THEN yesilSure IS normalUzun;
+	RULE 3 : IF yesilArac IS dusuk AND kirmiziArac IS dusuk THEN yesilSure IS normal;
+	RULE 4 : IF yesilArac IS dusuk AND kirmiziArac IS orta THEN yesilSure IS kisaNormal;
+	RULE 5 : IF yesilArac IS dusuk AND kirmiziArac IS yuksek THEN yesilSure IS kisa;
+	RULE 6 : IF yesilArac IS orta AND kirmiziArac IS sifir THEN yesilSure IS uzun;
+	RULE 7 : IF yesilArac IS orta AND kirmiziArac IS dusuk THEN yesilSure IS normalUzun;
+	RULE 8 : IF yesilArac IS orta AND kirmiziArac IS orta THEN yesilSure IS normal;
+	RULE 9 : IF yesilArac IS orta AND kirmiziArac IS yuksek THEN yesilSure IS kisa;
+	RULE 10 : IF yesilArac IS yuksek AND kirmiziArac IS sifir THEN yesilSure IS cokUzun;
+	RULE 11 : IF yesilArac IS yuksek AND kirmiziArac IS dusuk THEN yesilSure IS uzun;
+	RULE 12 : IF yesilArac IS yuksek AND kirmiziArac IS orta THEN yesilSure IS normalUzun;
+	RULE 13 : IF yesilArac IS yuksek AND kirmiziArac IS yuksek THEN yesilSure IS normal;
+	
+END_RULEBLOCK
+
+
+
+END_FUNCTION_BLOCK
